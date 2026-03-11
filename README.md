@@ -8,7 +8,7 @@ This server automatically generates MCP tools for all 175+ DataZone API operatio
 
 - **100% API coverage**: Every DataZone operation is exposed as an MCP tool
 - **Auto-updating**: New operations appear automatically when boto3 is updated
-- **Drop-in replacement**: Compatible with the existing `awslabs/amazon-datazone-mcp-server`
+- **Compatible**: Includes all tools from the official `awslabs/amazon-datazone-mcp-server`, plus 126+ more
 - **Dual transport**: Supports stdio (local) and Streamable HTTP (remote)
 - **Standard AWS credentials**: Uses the standard boto3 credential chain
 - **Correct parameter schemas**: Each tool exposes the exact input schema from the AWS API (not a generic kwargs wrapper)
@@ -17,7 +17,7 @@ This server automatically generates MCP tools for all 175+ DataZone API operatio
 
 ```bash
 # From source
-git clone https://github.com/your-org/amazon-sagemaker-catalog-mcp-server.git
+git clone https://github.com/difeorte/amazon-sagemaker-catalog-mcp-server.git
 cd amazon-sagemaker-catalog-mcp-server
 pip install .
 
@@ -38,7 +38,7 @@ The server uses the standard boto3 credential chain:
 
 ### IAM Permissions
 
-The IAM role or user needs `datazone:*` permissions:
+The IAM role or user needs DataZone permissions. For a read-only catalog agent (browse, search, subscribe):
 
 ```json
 {
@@ -46,16 +46,23 @@ The IAM role or user needs `datazone:*` permissions:
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": "datazone:*",
+      "Action": [
+        "datazone:List*",
+        "datazone:Get*",
+        "datazone:Search*",
+        "datazone:CreateSubscriptionRequest"
+      ],
       "Resource": "*"
     }
   ]
 }
 ```
 
-### SageMaker Unified Studio (V2 domains)
+For full access (create/update/delete resources), use `datazone:*` — but scope it down based on your use case. The server exposes all 175+ operations, so the IAM policy is what controls what the agent can actually do.
 
-For catalog operations like `search_listings`, `create_subscription_request`, etc., the IAM role must be added as a **project member** in the SMUS portal. This is a one-time setup per role per project. Without project membership, administrative operations (`list_domains`, `get_domain`, `list_projects`) still work, but catalog-level operations will return `AccessDeniedException`.
+### SageMaker Unified Studio Domains
+
+For catalog operations like `search_listings`, `create_subscription_request`, etc., the IAM role must be added as a **project member** in the SageMaker Unified Studio portal. This is a one-time setup per role per project. Without project membership, administrative operations (`list_domains`, `get_domain`, `list_projects`) still work, but catalog-level operations will return `AccessDeniedException`.
 
 ## Environment Variables
 
@@ -142,17 +149,19 @@ The server exposes 175+ tools, one for each DataZone API operation. Examples:
 
 For the complete list, start the server and use your MCP client's tool listing feature.
 
-## Known Limitations
+## Important Considerations
 
-- **`CreateProjectMembership`** — This API consistently returns `AccessDeniedException` when called via boto3/CLI, even with admin permissions. Adding IAM roles as project members must be done from the SMUS portal. This is a DataZone V2 service limitation, not a server issue.
+- **Project membership setup** — To add an IAM role as a project member programmatically, the data domain unit that owns the project must first have the "Add to project member pool" policy enabled by the domain unit owner. Without this policy, the API returns `AccessDeniedException`. Currently, adding project members is done from the SageMaker Unified Studio portal.
 
-- **Subscribed data access** — When a subscription is approved, SMUS creates resource links in the consumer project's Lakehouse database (e.g., `central_data_lake_<envId>`). To query subscribed data, the agent must chain-assume the project execution role (`datazone_usr_role_<projectId>_<envId>`) and use the project's Athena workgroup. The data appears under the local Lakehouse database, not the producer's catalog ID.
+- **Tested on SageMaker Catalog** — This server has been tested on SageMaker Catalog (which runs on Amazon DataZone). It has not been tested on standalone DataZone V1 domains.
 
-- **V1 vs V2 domains** — DataZone V1 domains have different authorization behavior than V2 (SageMaker Unified Studio). This server works with both, but catalog-level operations on V2 domains require IAM role project membership.
+## Querying Subscribed Data
+
+When a subscription is approved, SageMaker Unified Studio creates resource links in the consumer project's Lakehouse database (e.g., `central_data_lake_<envId>`). To query subscribed data, the agent must chain-assume the project execution role (`datazone_usr_role_<projectId>_<envId>`) and use the project's Athena workgroup. The data appears under the local Lakehouse database, not the producer's catalog ID.
 
 ## Compatibility
 
-This server is a drop-in replacement for `awslabs/amazon-datazone-mcp-server` (v0.1.1). All 49 tools from the existing server are available with the same names and parameters, plus 126+ additional tools covering the rest of the API.
+This server is an unofficial extended version inspired by `awslabs/amazon-datazone-mcp-server` (v0.1.1). All 49 tools from the official server are available with the same names and parameters, plus 126+ additional tools covering the rest of the API.
 
 ## Development
 
