@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "sagemaker-catalog": {
+      "command": "/Users/difeorte/Desktop/Assets/2026/amazon-sagemaker-catalog-mcp-server/.venv/bin/python",
+      "args": [
+        "-m",
+        "sagemaker_catalog_mcp_server"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-1",
+        "AWS_PROFILE": "glue-connection-role",
+        "PYTHONPATH": "/Users/difeorte/Desktop/Assets/2026/amazon-sagemaker-catalog-mcp-server/src"
+      },
+      "autoApprove": [
+        "list_domains",
+        "search_listings",
+        "get_project",
+        "get_asset",
+        "get_listing",
+        "list_projects",
+        "create_subscription_request",
+        "get_subscription_request_details",
+        "list_environments"
+      ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.hypothesis/
+*.egg
+.DS_Store
+
+# Internal project files (not for public repo)
+CONTEXT_FOR_NEW_PROJECT.md
+PROJECT_STATUS.md
+IAM_ROLE_ACCESS_FINDINGS.md
+
+# Local MCP config (contains user-specific paths)
+.kiro/settings/mcp.json
+
+# Test scripts
+scripts/

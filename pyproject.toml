@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amazon-sagemaker-catalog-mcp-server"
+version = "0.1.0"
+description = "MCP server for Amazon SageMaker Catalog (DataZone) with 100% API coverage via auto-generation from botocore service model"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [
+    { name = "Amazon Web Services" },
+]
+keywords = ["mcp", "sagemaker", "datazone", "catalog", "aws"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "mcp",
+    "boto3",
+    "botocore",
+]
+
+[project.scripts]
+sagemaker-catalog-mcp-server = "sagemaker_catalog_mcp_server.server:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "hypothesis",
+    "pytest-mock",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sagemaker_catalog_mcp_server"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
